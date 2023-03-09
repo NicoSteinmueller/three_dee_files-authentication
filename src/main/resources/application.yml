@@ -6,6 +6,7 @@ spring:
     hibernate:
       ddl-auto: update
       dialect: org.hibernate.dialect.MySQL8Dialect
+    open-in-view: false
   datasource:
     #ToDo Remove before commit
     url: jdbc:mysql://localhost:3307/authentication
