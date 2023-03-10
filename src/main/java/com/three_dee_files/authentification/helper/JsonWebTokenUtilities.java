@@ -5,17 +5,20 @@ import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
 import java.util.Date;
 
 @Service
 public class JsonWebTokenUtilities {
 
-    @Value("${app.jsonWebToken.secret}")
     private static Key SECRET_KEY;
-
+    @Value("${app.jsonWebToken.secret}")
+    protected void setSecretKey(String secret){
+        SECRET_KEY = new SecretKeySpec(secret.getBytes(), "HmacSHA512");
+    }
     @Value("${app.jsonWebToken.duration}")
-    private static long EXPIRE_DURATION;
+    long EXPIRE_DURATION;
 
 
     public String generateToken(Account account){
