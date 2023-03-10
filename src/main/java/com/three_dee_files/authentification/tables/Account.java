@@ -20,10 +20,11 @@ public class Account {
     @Column(nullable = false, columnDefinition = "varchar(320)")
     private String email;
 
-    @Column(nullable = false, columnDefinition = "varchar(512)")
-    private String passwordHash;
+    @Lob
+    @Column(nullable = false, columnDefinition = "BLOB")
+    private byte[] passwordHash;
 
-    public Account(String email, String passwordHash){
+    public Account(String email, byte[] passwordHash){
         this.email = email;
         this.passwordHash = passwordHash;
     }

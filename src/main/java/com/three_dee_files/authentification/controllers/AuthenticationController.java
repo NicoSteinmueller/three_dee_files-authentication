@@ -23,7 +23,7 @@ public class AuthenticationController {
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestParam String email, @RequestParam String password){
-        String passwordHash=  HashUtilities.hashSHA512(password);
+        byte[] passwordHash =  HashUtilities.hashSHA512(password);
         if (accountRepository.existsAccountByEmailAndPasswordHash(email,passwordHash)){
             var token = jsonWebTokenUtilities.generateToken(accountRepository.getAccountByEmailAndPasswordHash(email, passwordHash));
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(token);

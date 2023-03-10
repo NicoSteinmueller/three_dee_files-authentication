@@ -1,6 +1,7 @@
 package com.three_dee_files.authentification.controllers;
 
 import com.three_dee_files.authentification.helper.EmailChecker;
+import com.three_dee_files.authentification.helper.HashUtilities;
 import com.three_dee_files.authentification.helper.KeyChecker;
 import com.three_dee_files.authentification.repositorys.AccountRepository;
 import com.three_dee_files.authentification.tables.Account;
@@ -22,13 +23,14 @@ public class AccountController {
     @Autowired
     private KeyChecker keyChecker;
     @PostMapping("/add")
-    public ResponseEntity<HttpStatus> addUser(@RequestParam String key ,@RequestParam String email, @RequestParam String passwordHash){
+    public ResponseEntity<HttpStatus> addUser(@RequestParam String key ,@RequestParam String email, @RequestParam String password){
         if (!keyChecker.isValidBackendKey(key))
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         if (!userRepository.findUsersByEmail(email).isEmpty())
             return new ResponseEntity<>(HttpStatus.CONFLICT);
-        if (EmailChecker.isValidEmailAddress(email) && passwordHash.length()==512) {
-            Account user = new Account(email, passwordHash);
+        //TODO add password rules
+        if (EmailChecker.isValidEmailAddress(email) && !password.isEmpty()) {
+            Account user = new Account(email, HashUtilities.hashSHA512(password));
             userRepository.saveAndFlush(user);
             return new ResponseEntity<>(HttpStatus.ACCEPTED);
         }
