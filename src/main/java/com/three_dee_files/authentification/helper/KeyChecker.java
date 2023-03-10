@@ -10,6 +10,6 @@ public class KeyChecker {
     private BackendKeyRepository backendKeyRepository;
 
     public boolean isValidBackendKey(String key){
-        return backendKeyRepository.existsById(key);
+        return backendKeyRepository.existsBackendKeyByAPIkey(key);
     }
 }

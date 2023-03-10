@@ -7,6 +7,8 @@ import jakarta.persistence.*;
 public class BackendKey {
 
     @Id
+    private int id;
+
     @Column(nullable = false, columnDefinition = "varchar(1024)")
     private String APIkey;
 
