@@ -9,4 +9,5 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
     List<Account> findUsersByEmail(String email);
     boolean existsAccountByEmailAndPasswordHash(String email, byte[] passwordHash);
     Account getAccountByEmailAndPasswordHash (String email, byte[] passwordHash);
+    boolean existsAccountByEmail (String email);
 }

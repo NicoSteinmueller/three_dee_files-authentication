@@ -31,4 +31,11 @@ public class AuthenticationController {
 
         return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
     }
+
+    @PostMapping("/validateToken")
+    public ResponseEntity<HttpStatus> validateToken(@RequestParam String token){
+        if (jsonWebTokenUtilities.isTokenValid(token))
+            return new ResponseEntity<> (HttpStatus.ACCEPTED);
+        return new ResponseEntity<> (HttpStatus.NOT_ACCEPTABLE);
+    }
 }
