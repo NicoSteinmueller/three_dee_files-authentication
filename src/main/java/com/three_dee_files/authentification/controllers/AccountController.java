@@ -19,21 +19,32 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class AccountController {
 
     @Autowired
-    private AccountRepository userRepository;
+    private AccountRepository accountRepository;
     @Autowired
     private KeyChecker keyChecker;
+
     @PostMapping("/add")
     public ResponseEntity<HttpStatus> addUser(@RequestParam String key ,@RequestParam String email, @RequestParam String password){
         if (!keyChecker.isValidBackendKey(key))
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        if (!userRepository.findUsersByEmail(email).isEmpty())
+        if (accountRepository.existsAccountByEmail(email))
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         //TODO add password rules
         if (EmailChecker.isValidEmailAddress(email) && !password.isEmpty()) {
             Account user = new Account(email, HashUtilities.hashSHA512(password));
-            userRepository.saveAndFlush(user);
+            accountRepository.saveAndFlush(user);
             return new ResponseEntity<>(HttpStatus.ACCEPTED);
         }
         return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+    }
+
+    @PostMapping("/remove")
+    public ResponseEntity<HttpStatus> removeUser(@RequestParam String key, @RequestParam String email){
+        if (!keyChecker.isValidBackendKey(key))
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        if (!accountRepository.existsAccountByEmail(email))
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        accountRepository.deleteAccountByEmail(email);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 }
