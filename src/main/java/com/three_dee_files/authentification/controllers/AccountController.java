@@ -80,6 +80,7 @@ public class AccountController {
     }
 
     @PostMapping("/verifyTOTP")
+    @Transactional
     public ResponseEntity<HttpStatus> verifyTOTP(@RequestParam String token, @RequestParam String otp){
         if (!jsonWebTokenUtilities.isTokenValid(token))
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
@@ -96,7 +97,24 @@ public class AccountController {
         account.setTotpSecret(tempTotpSecret.getTotpSecret());
         accountRepository.saveAndFlush(account);
 
-        return null;
+        tempTotpSecretRepository.deleteByAccount(account);
+
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
+    @PostMapping("/removeTOTP")
+    public ResponseEntity<String> removeTOTP(@RequestParam String token, @RequestParam String otp){
+        if (!jsonWebTokenUtilities.isTokenValid(token))
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token invalid.");
+
+        var account = accountRepository.getAccountByEmail(jsonWebTokenUtilities.getEmail(token));
+
+        if (!TotpUtilities.validate(account.getTotpSecret(), otp))
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("OTP invalid.");
+
+        account.setTotpSecret(null);
+        accountRepository.saveAndFlush(account);
+
+        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+    }
 }
