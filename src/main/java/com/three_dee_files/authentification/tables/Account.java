@@ -24,6 +24,9 @@ public class Account {
     @Column(nullable = false, columnDefinition = "BLOB")
     private byte[] passwordHash;
 
+    @Column(columnDefinition = "varchar(64)")
+    private String totpSecret;
+
     public Account(String email, byte[] passwordHash){
         this.email = email;
         this.passwordHash = passwordHash;

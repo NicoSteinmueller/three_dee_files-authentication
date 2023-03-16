@@ -55,4 +55,13 @@ public class JsonWebTokenUtilities {
         }
     }
 
+    public String getEmail(String token){
+        try {
+            Claims claims = Jwts.parserBuilder().setSigningKey(SECRET_KEY).build().parseClaimsJws(token).getBody();
+            return claims.getSubject();
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
 }

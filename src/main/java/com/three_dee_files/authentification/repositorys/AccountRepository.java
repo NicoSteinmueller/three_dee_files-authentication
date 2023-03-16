@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface AccountRepository extends JpaRepository<Account, Integer> {
     boolean existsAccountByEmailAndPasswordHash(String email, byte[] passwordHash);
     Account getAccountByEmailAndPasswordHash (String email, byte[] passwordHash);
+    Account getAccountByEmail (String email);
     boolean existsAccountByEmail (String email);
     void deleteAccountByEmail (String email);
 }
