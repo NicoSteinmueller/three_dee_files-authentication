@@ -62,6 +62,11 @@ public class AccountController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
         var account = accountRepository.getAccountByEmail(jsonWebTokenUtilities.getEmail(token));
+
+
+        if (account.getTotpSecret() != null)
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+
         String secret = TotpUtilities.generateNewSecret();
 
         if (tempTotpSecretRepository.existsByAccount(account))
