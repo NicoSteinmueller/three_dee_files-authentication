@@ -1,8 +1,13 @@
 package com.three_dee_files.authentification.helper;
 
+import com.three_dee_files.authentification.repositorys.BackupCodeRepository;
+import com.three_dee_files.authentification.tables.Account;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base32;
 import org.apache.commons.codec.binary.Hex;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -11,7 +16,10 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
-public final class TotpUtilities {
+@Service
+public class TotpUtilities {
+    @Autowired
+    private BackupCodeRepository backupCodeRepository;
 
     static long STEPSIZE = 30000;
     public static String generateNewSecret(){
@@ -20,6 +28,17 @@ public final class TotpUtilities {
         random.nextBytes(bytes);
         Base32 base32 = new Base32();
         return base32.encodeAsString(bytes);
+    }
+
+    @Transactional
+    public boolean validate(Account account, String otp){
+        if (validate(account.getTotpSecret(), otp))
+            return true;
+        if (backupCodeRepository.existsBackupCodeByAccountAndOtp(account, otp)){
+            backupCodeRepository.deleteByAccountAndOtp(account, otp);
+            return true;
+        }
+        return false;
     }
 
     public static boolean validate(String secret, String otp){

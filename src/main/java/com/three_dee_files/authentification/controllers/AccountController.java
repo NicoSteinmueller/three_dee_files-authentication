@@ -2,8 +2,10 @@ package com.three_dee_files.authentification.controllers;
 
 import com.three_dee_files.authentification.helper.*;
 import com.three_dee_files.authentification.repositorys.AccountRepository;
+import com.three_dee_files.authentification.repositorys.BackupCodeRepository;
 import com.three_dee_files.authentification.repositorys.TempTotpSecretRepository;
 import com.three_dee_files.authentification.tables.Account;
+import com.three_dee_files.authentification.tables.BackupCode;
 import com.three_dee_files.authentification.tables.TempTotpSecret;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,6 +15,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Controller
@@ -29,6 +35,12 @@ public class AccountController {
 
     @Autowired
     private TempTotpSecretRepository tempTotpSecretRepository;
+
+    @Autowired
+    private BackupCodeRepository backupCodeRepository;
+
+    @Autowired
+    private TotpUtilities totpUtilities;
 
     @PostMapping("/add")
     public ResponseEntity<HttpStatus> addUser(@RequestParam String key ,@RequestParam String email, @RequestParam String password){
@@ -81,7 +93,7 @@ public class AccountController {
 
     @PostMapping("/verifyTOTP")
     @Transactional
-    public ResponseEntity<HttpStatus> verifyTOTP(@RequestParam String token, @RequestParam String otp){
+    public ResponseEntity<String> verifyTOTP(@RequestParam String token, @RequestParam String otp){
         if (!jsonWebTokenUtilities.isTokenValid(token))
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
@@ -99,19 +111,34 @@ public class AccountController {
 
         tempTotpSecretRepository.deleteByAccount(account);
 
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        SecureRandom secureRandom = new SecureRandom();
+        List<String> list = new ArrayList<>();
+
+        for (int i = 0; i < 6; i++) {
+            StringBuilder randomOTP = new StringBuilder();
+            for (int j = 0; j < 6; j++) {
+                randomOTP.append(secureRandom.nextInt(10));
+            }
+            BackupCode backupCode = new BackupCode(account, randomOTP.toString());
+            backupCodeRepository.saveAndFlush(backupCode);
+            list.add(randomOTP.toString());
+        }
+
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(list.toString());
     }
 
     @PostMapping("/removeTOTP")
+    @Transactional
     public ResponseEntity<String> removeTOTP(@RequestParam String token, @RequestParam String otp){
         if (!jsonWebTokenUtilities.isTokenValid(token))
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token invalid.");
 
         var account = accountRepository.getAccountByEmail(jsonWebTokenUtilities.getEmail(token));
 
-        if (!TotpUtilities.validate(account.getTotpSecret(), otp))
+        if (!totpUtilities.validate(account, otp))
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("OTP invalid.");
 
+        backupCodeRepository.deleteByAccount(account);
         account.setTotpSecret(null);
         accountRepository.saveAndFlush(account);
 

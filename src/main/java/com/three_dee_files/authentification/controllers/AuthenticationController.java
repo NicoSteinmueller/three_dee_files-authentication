@@ -19,10 +19,13 @@ import java.util.Optional;
 public class AuthenticationController {
 
     @Autowired
-    AccountRepository accountRepository;
+    private AccountRepository accountRepository;
 
     @Autowired
-    JsonWebTokenUtilities jsonWebTokenUtilities;
+    private JsonWebTokenUtilities jsonWebTokenUtilities;
+
+    @Autowired
+    private TotpUtilities totpUtilities;
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestParam String email, @RequestParam String password ,@RequestParam Optional<String> otp){
@@ -30,7 +33,7 @@ public class AuthenticationController {
         if (accountRepository.existsAccountByEmailAndPasswordHash(email,passwordHash)){
             var account = accountRepository.getAccountByEmailAndPasswordHash(email, passwordHash);
             if (account.getTotpSecret() != null)
-                if (otp.isEmpty() || !TotpUtilities.validate(account.getTotpSecret(),otp.get()))
+                if (otp.isEmpty() || !totpUtilities.validate(account,otp.get()))
                     return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("OTP is wrong or missing!");
             var token = jsonWebTokenUtilities.generateToken(accountRepository.getAccountByEmailAndPasswordHash(email, passwordHash));
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(token);
