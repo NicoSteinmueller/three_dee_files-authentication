@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Optional;
+
 
 @Controller
 @RequestMapping("/user")
@@ -33,6 +35,8 @@ public class AccountController {
 
     @Autowired
     private BackupCodeRepository backupCodeRepository;
+
+    @Autowired AuthenticationController authenticationController;
 
     @Autowired
     private TotpUtilities totpUtilities;
@@ -61,6 +65,23 @@ public class AccountController {
         accountRepository.deleteAccountByEmail(email);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
+
+    @PostMapping("/changePassword")
+    public ResponseEntity<String> changePassword(@RequestParam String email, @RequestParam String oldPassword, @RequestParam String newPassword, Optional<String> otp){
+        var login = authenticationController.login(email, oldPassword, otp);
+        if (login.getStatusCode()!=HttpStatus.ACCEPTED)
+            return login;
+
+        if (oldPassword.equals(newPassword))
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("new and old password are the same");
+
+        Account account = accountRepository.getAccountByEmail(email);
+        account.setPasswordHash(HashUtilities.hashSHA512(newPassword));
+
+        accountRepository.saveAndFlush(account);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+    }
+
 
     @PostMapping("/addTOTP")
     @Transactional
