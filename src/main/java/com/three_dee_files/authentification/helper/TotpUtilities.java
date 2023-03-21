@@ -34,15 +34,15 @@ public class TotpUtilities {
     }
 
     @Transactional
-    public boolean validate(Account account, String otp){
+    public boolean isInvalid(Account account, String otp){
         if (validate(account.getTotpSecret(), otp))
-            return true;
+            return false;
         byte[] otpHash = HashUtilities.hashSHA512(otp);
         if (backupCodeRepository.existsBackupCodeByAccountAndOtp(account, otpHash)){
             backupCodeRepository.deleteByAccountAndOtp(account, otpHash);
-            return true;
+            return false;
         }
-        return false;
+        return true;
     }
 
     public static boolean validate(String secret, String otp){

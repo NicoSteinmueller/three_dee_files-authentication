@@ -33,7 +33,7 @@ public class AuthenticationController {
         if (accountRepository.existsAccountByEmailAndPasswordHash(email,passwordHash)){
             var account = accountRepository.getAccountByEmailAndPasswordHash(email, passwordHash);
             if (account.getTotpSecret() != null)
-                if (otp.isEmpty() || !totpUtilities.validate(account,otp.get()))
+                if (otp.isEmpty() || totpUtilities.isInvalid(account, otp.get()))
                     return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("OTP is wrong or missing!");
             var token = jsonWebTokenUtilities.generateToken(accountRepository.getAccountByEmailAndPasswordHash(email, passwordHash));
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(token);

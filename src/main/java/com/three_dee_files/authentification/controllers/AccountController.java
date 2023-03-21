@@ -119,7 +119,7 @@ public class AccountController {
 
         var account = accountRepository.getAccountByEmail(jsonWebTokenUtilities.getEmail(token));
 
-        if (!totpUtilities.validate(account, otp))
+        if (totpUtilities.isInvalid(account, otp))
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("OTP invalid.");
 
         backupCodeRepository.deleteByAccount(account);
