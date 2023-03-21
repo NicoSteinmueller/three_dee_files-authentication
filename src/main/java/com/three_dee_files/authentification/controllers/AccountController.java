@@ -39,7 +39,7 @@ public class AccountController {
 
     @PostMapping("/add")
     public ResponseEntity<HttpStatus> addUser(@RequestParam String key ,@RequestParam String email, @RequestParam String password){
-        if (!keyChecker.isValidBackendKey(key))
+        if (keyChecker.isInvalidBackendKey(key))
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         if (accountRepository.existsAccountByEmail(email))
             return new ResponseEntity<>(HttpStatus.CONFLICT);
@@ -54,7 +54,7 @@ public class AccountController {
 
     @PostMapping("/remove")
     public ResponseEntity<HttpStatus> removeUser(@RequestParam String key, @RequestParam String email){
-        if (!keyChecker.isValidBackendKey(key))
+        if (keyChecker.isInvalidBackendKey(key))
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         if (!accountRepository.existsAccountByEmail(email))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
