@@ -16,8 +16,5 @@ spring:
 
 app:
   jsonWebToken:
-    secret: "testfbhsdfhvdfskjdfhg9uorrt743zh7943hzt4uhrtj4jtui4hz4aij498ujthg4zhnawifrkarfhazuuaj4w3e43q08rh43fjfka4fha47hfj4aew8fh4af489r43h4uj4j8r4uik43qa9804hr9ijk48hhoi"
     duration: 43200000 #12 hours in milliseconds
     issuer: "ThreeDeeFilesAuthenticationService"
-  backend:
-    keyHash: "47SC4IIGLUOH54GNM6P4WB3G3KGHPEZI625ZJZL3PWWPZANUZPIPKD5K3LWWNTX5TCLPWJEKOSENCME37BGOZM6AOTTRWSC4Y2QIZVQ="

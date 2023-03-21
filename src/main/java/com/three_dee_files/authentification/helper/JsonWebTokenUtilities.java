@@ -17,7 +17,7 @@ public class JsonWebTokenUtilities {
 
     private static Key SECRET_KEY;
 
-    @Value("${app.jsonWebToken.secret}")
+    @Value("#{environment.SECRET}")
     protected void setSecretKey(String secret){
         SECRET_KEY = new SecretKeySpec(secret.getBytes(), "HmacSHA512");
     }
