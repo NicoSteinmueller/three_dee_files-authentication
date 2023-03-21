@@ -1,4 +1,4 @@
-package com.three_dee_files.authentification.helper;
+package com.three_dee_files.authentification.helpers;
 
 import com.three_dee_files.authentification.repositorys.AccountRepository;
 import com.three_dee_files.authentification.tables.Account;

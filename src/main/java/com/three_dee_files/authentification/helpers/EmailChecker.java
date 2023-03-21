@@ -1,4 +1,4 @@
-package com.three_dee_files.authentification.helper;
+package com.three_dee_files.authentification.helpers;
 
 public class EmailChecker {
     public static boolean isValidEmailAddress(String email) {

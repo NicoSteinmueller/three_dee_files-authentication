@@ -1,6 +1,6 @@
 package com.three_dee_files.authentification.controllers;
 
-import com.three_dee_files.authentification.helper.*;
+import com.three_dee_files.authentification.helpers.*;
 import com.three_dee_files.authentification.repositorys.AccountRepository;
 import com.three_dee_files.authentification.repositorys.BackupCodeRepository;
 import com.three_dee_files.authentification.repositorys.TempTotpSecretRepository;

@@ -1,8 +1,8 @@
 package com.three_dee_files.authentification.controllers;
 
-import com.three_dee_files.authentification.helper.HashUtilities;
-import com.three_dee_files.authentification.helper.JsonWebTokenUtilities;
-import com.three_dee_files.authentification.helper.TotpUtilities;
+import com.three_dee_files.authentification.helpers.HashUtilities;
+import com.three_dee_files.authentification.helpers.JsonWebTokenUtilities;
+import com.three_dee_files.authentification.helpers.TotpUtilities;
 import com.three_dee_files.authentification.repositorys.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
