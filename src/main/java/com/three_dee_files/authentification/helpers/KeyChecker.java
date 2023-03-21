@@ -8,7 +8,7 @@ public class KeyChecker {
 
     private static String BACKENDKEY;
 
-    @Value("#{environment.BACKENDKEY}")
+    @Value("${app.backend.key}")
     protected void setBACKENDKEY(String key){
         BACKENDKEY = key;
     }

@@ -16,5 +16,8 @@ spring:
 
 app:
   jsonWebToken:
+    secret: ${SECRET}
     duration: 43200000 #12 hours in milliseconds
     issuer: "ThreeDeeFilesAuthenticationService"
+  backend:
+    key: ${BACKENDKEY}
