@@ -2,6 +2,7 @@ package com.three_dee_files.authentification.helper;
 
 import com.three_dee_files.authentification.repositorys.BackupCodeRepository;
 import com.three_dee_files.authentification.tables.Account;
+import com.three_dee_files.authentification.tables.BackupCode;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base32;
 import org.apache.commons.codec.binary.Hex;
@@ -15,6 +16,8 @@ import java.lang.reflect.UndeclaredThrowableException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class TotpUtilities {
@@ -34,8 +37,9 @@ public class TotpUtilities {
     public boolean validate(Account account, String otp){
         if (validate(account.getTotpSecret(), otp))
             return true;
-        if (backupCodeRepository.existsBackupCodeByAccountAndOtp(account, otp)){
-            backupCodeRepository.deleteByAccountAndOtp(account, otp);
+        byte[] otpHash = HashUtilities.hashSHA512(otp);
+        if (backupCodeRepository.existsBackupCodeByAccountAndOtp(account, otpHash)){
+            backupCodeRepository.deleteByAccountAndOtp(account, otpHash);
             return true;
         }
         return false;
@@ -70,6 +74,25 @@ public class TotpUtilities {
             result.insert(0, "0");
 
         return result.toString();
+    }
+
+    public List<String> generateBackupCodes(Account account){
+        SecureRandom secureRandom = new SecureRandom();
+        List<String> list = new ArrayList<>();
+
+        for (int i = 0; i < 6; i++) {
+            StringBuilder randomOTP = new StringBuilder();
+            for (int j = 0; j < 6; j++) {
+                randomOTP.append(secureRandom.nextInt(10));
+            }
+            String rOTP = randomOTP.toString();
+            byte[] randomOTPhash = HashUtilities.hashSHA512(rOTP);
+
+            BackupCode backupCode = new BackupCode(account, randomOTPhash);
+            backupCodeRepository.saveAndFlush(backupCode);
+            list.add(rOTP);
+        }
+        return list;
     }
 
     private static byte[] hash(byte[] bytesSecret, byte[] bytesSteps){

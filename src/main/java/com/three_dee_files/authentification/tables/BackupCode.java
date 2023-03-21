@@ -17,10 +17,11 @@ public class BackupCode {
     @JoinColumn(columnDefinition = "int")
     private Account account;
 
-    @Column(nullable = false)
-    private String otp;
+    @Lob
+    @Column(nullable = false, columnDefinition = "BLOB")
+    private byte[] otp;
 
-    public BackupCode(Account account, String otp){
+    public BackupCode(Account account, byte[] otp){
         this.account = account;
         this.otp = otp;
     }
